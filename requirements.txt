@@ -1,13 +1,14 @@
 aiofiles
-aiohttp
-dnspython
+aiohttp==3.9.4
+beautifulsoup4
+dnspython==2.1.0
 ffmpeg-python
 gitpython
 hachoir
 heroku3
 lyricsgenius
 motor
-ntgcalls
+ntgcalls>=1.2.3
 pillow
 psutil
 py-tgcalls==2.0.3
