@@ -31,7 +31,7 @@ def save_file(pastebin_url, file_path='cookies.txt'):
     except requests.exceptions.RequestException as e:
         return None
 
-pastebin_url = f"https://pastebin.com/raw/{paste_id}"
+pastebin_url = f"https://batbin.me/raw/{paste_id}"
 file_path = save_file(pastebin_url)
 
 LOGGER(__name__).info("Dizinler güncellendi.")
