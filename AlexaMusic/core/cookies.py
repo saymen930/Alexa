@@ -14,7 +14,7 @@ import requests
 import config
 from ..logging import LOGGER
 
-full_url = str(config.cookies)
+full_url = str(config.COOKIES)
 paste_id = full_url.split("/")[-1]
 
 def save_file(pastebin_url, file_path='cookies.txt'):
