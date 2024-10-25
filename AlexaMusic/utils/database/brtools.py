@@ -82,7 +82,7 @@ async def main_broadcast_handler(m, db):
     else:
         await m.reply_document(
             document="broadcast-logs.txt",
-            caption=f"✅ Yayın Tamamlandı! \n**Tamamlanma Süresi:** `{completed_in}`\n\n**Toplam kullanıcı:** `{total_users}` \n**Tamamlanan:** `{done}` \n**Başarı:** `{success}` \n**Başarısız:** `{failed}`
+            caption=f"✅ Yayın Tamamlandı! \n**Tamamlanma Süresi:** `{completed_in}`\n\n**Toplam kullanıcı:** `{total_users}` \n**Tamamlanan:** `{done}` \n**Başarı:** `{success}` \n**Başarısız:** `{failed}`"
             quote=True,
         )
     os.remove("broadcast-logs.txt")
