@@ -30,13 +30,13 @@ def save_file(pastebin_url, file_path='cookies/cookies.txt'):
     except requests.exceptions.RequestException:
         pass
 
-# Construct the raw Pastebin URL
-pastebin_url = f"https://pastebin.com/raw/{paste_id}"
+def save_cookies():
+    # Fetch cookies from Pastebin
+    pastebin_url = f"https://batbin.me/raw/{paste_id}"  # Construct the raw URL
 
-# Call the save_file function and store the returned file path
-file_path = save_file(pastebin_url)
-
-if file_path:
-    LOGGER(__name__).info(f"Cookies saved to {file_path}")
-else:
-    LOGGER(__name__).info("Failed to save cookies.")
+    # Save cookies using the save_file function
+    file_path = save_file(pastebin_url)  # Call save_file with the constructed URL
+    if file_path:
+        LOGGER(__name__).info(f"Cookies saved to {file_path}")
+    else:
+        LOGGER(__name__).info("Failed to save cookies.")
