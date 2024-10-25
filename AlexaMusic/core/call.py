@@ -27,7 +27,7 @@ from pytgcalls.exceptions import (
     GroupCallNotFound,
     NotInCallError,
 )
-from pytgcalls.types import ChatUpdate, MediaStream, Update, GroupCallParticipant
+from pytgcalls.types import ChatUpdate, MediaStream, Update, GroupCallParticipant, UpdatedGroupCallParticipant
 from pytgcalls.types.stream import StreamAudioEnded
 
 import config
@@ -615,27 +615,28 @@ class Call(PyTgCalls):
         @self.four.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT | GroupCallParticipant.Action.UPDATED))
         @self.five.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT | GroupCallParticipant.Action.UPDATED))
         async def participants_change_handler(client, update: Update):
-            if not isinstance(update, GroupCallParticipant):
+            if not isinstance(update, UpdatedGroupCallParticipant):
                 return
+            participant = update.participant
             chat_id = update.chat_id
-            action = update.participant.action
+            action = participant.action
             users = counter.get(chat_id)
-            if not users:
+            if users is None:
                 try:
-                    got = len(await client.get_participants(chat_id))
-                except:
+                    users = len(await client.get_participants(chat_id))
+                except Exception as e:
+                    print(f"Error fetching participants for chat_id {chat_id}: {e}")
                     return
-                counter[chat_id] = got
-                if got == 1:
-                    autoend[chat_id] = datetime.now() + timedelta(minutes=AUTO_END_TIME)
-                    return
-                autoend[chat_id] = {}
+                counter[chat_id] = users
             else:
-                final = users + 1 if action == GroupCallParticipant.Action.JOINED else users - 1
-                counter[chat_id] = final
-                if final == 1:
-                    autoend[chat_id] = datetime.now() + timedelta(minutes=AUTO_END_TIME)
-                else:
-                    autoend[chat_id] = {}
+                if action == GroupCallParticipant.Action.JOINED:
+                    users += 1
+                elif action == GroupCallParticipant.Action.LEFT:
+                    users -= 1
+                counter[chat_id] = users
+            if users == 1:
+                autoend[chat_id] = datetime.now() + timedelta(minutes=AUTO_END_TIME)
+            else:
+                autoend[chat_id] = {}
 
 Alexa = Call()
