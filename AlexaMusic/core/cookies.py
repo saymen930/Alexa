@@ -17,7 +17,7 @@ from ..logging import LOGGER
 full_url = str(config.COOKIES)
 paste_id = full_url.split("/")[-1]
 
-def save_file(pastebin_url, file_path='cookies.txt'):
+def save_file(pastebin_url, file_path='cookies/cookies.txt'):
     try:
         # Send a GET request to the Pastebin URL
         response = requests.get(pastebin_url)
