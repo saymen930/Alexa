@@ -22,9 +22,6 @@ from .logging import LOGGER
 # Directories
 dirr()
 
-#cookies
-save_cookies()
-
 # Check Git Updates
 git()
 
@@ -33,6 +30,9 @@ dbb()
 
 # Heroku APP
 heroku()
+
+#cookies
+save_cookies()
 
 # Bot Client
 app = AlexaBot()
