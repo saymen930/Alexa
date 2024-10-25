@@ -1,5 +1,5 @@
 aiofiles
-aiohttp==3.9.4
+aiohttp==3.9.3
 beautifulsoup4
 dnspython==2.1.0
 ffmpeg-python
@@ -19,7 +19,7 @@ PyYAML
 requests
 speedtest-cli
 spotipy
-tgcrypto
+tgcrypto-pyroblack>=1.2.6
 unidecode
 yt-dlp
 youtube-search
