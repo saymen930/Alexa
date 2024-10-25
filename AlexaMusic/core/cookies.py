@@ -15,8 +15,6 @@ import requests
 import config
 from ..logging import LOGGER
 
-full_url = str(config.COOKIES)
-paste_id = full_url.split("/")[-1]
 
 def save_file(pastebin_url, file_path='cookies/cookies.txt'):
     try:
@@ -24,20 +22,26 @@ def save_file(pastebin_url, file_path='cookies/cookies.txt'):
         response = requests.get(pastebin_url)
         response.raise_for_status()  # Raise an error for unsuccessful requests
 
+        # Ensure the directory exists
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
         # Write the content to the specified file
         with open(file_path, 'w') as file:
             file.write(response.text)
         return file_path
+    
     except requests.exceptions.RequestException:
         pass
 
 def save_cookies():
-    # Fetch cookies from Pastebin
-    pastebin_url = f"https://batbin.me/raw/{paste_id}"  # Construct the raw URL
+    full_url = str(config.COOKIES)
+    paste_id = full_url.split("/")[-1]
+    # Construct the raw URL
+    pastebin_url = f"https://batbin.me/raw/{paste_id}"
 
     # Save cookies using the save_file function
     file_path = save_file(pastebin_url)  # Call save_file with the constructed URL
     if file_path and os.path.getsize(file_path) > 0:
-        LOGGER(__name__).info(f"Cookies saved to {file_path}.")
+        LOGGER(__name__).info(f"Cookies saved successfully to {file_path}.")
     else:
-        LOGGER(__name__).info("Failed to save cookies or the file is empty.")
+        LOGGER(__name__).error("Failed to save cookies or the file is empty.")
