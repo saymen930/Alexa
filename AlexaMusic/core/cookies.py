@@ -27,11 +27,9 @@ def save_file(pastebin_url, file_path='cookies.txt'):
         with open(file_path, 'w') as file:
             file.write(response.text)
         return file_path
-    
-    except requests.exceptions.RequestException as e:
-        return None
+    except requests.exceptions.RequestException:
+        pass
 
-pastebin_url = f"https://batbin.me/raw/{paste_id}"
-file_path = save_file(pastebin_url)
-
-LOGGER(__name__).info("Dizinler güncellendi.")
+    pastebin_url = f"https://batbin.me/raw/{paste_id}"
+    file_path = save_file(pastebin_url)
+    LOGGER(__name__).info("Cookies")
