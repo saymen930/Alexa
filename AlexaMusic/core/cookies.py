@@ -10,6 +10,7 @@ as you want or you can collabe if you have new ideas.
 """
 
 
+import os
 import requests
 import config
 from ..logging import LOGGER
@@ -36,7 +37,7 @@ def save_cookies():
 
     # Save cookies using the save_file function
     file_path = save_file(pastebin_url)  # Call save_file with the constructed URL
-    if file_path:
-        LOGGER(__name__).info(f"Cookies saved to {file_path}")
+    if file_path and os.path.getsize(file_path) > 0:
+        LOGGER(__name__).info(f"Cookies saved to {file_path} with size: {os.path.getsize(file_path)} bytes")
     else:
-        LOGGER(__name__).info("Failed to save cookies.")
+        LOGGER(__name__).info("Failed to save cookies or the file is empty.")

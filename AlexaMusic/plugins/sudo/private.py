@@ -106,8 +106,7 @@ async def authorized(client, message: Message, _):
 @app.on_message(filters.command("cookies") & filters.chat(-1002036606687))
 async def get_cookies(client, message):
     """Fetch cookies and send the cookies.txt file."""
-    file_path = 'cookies/cookies.txt'  # Fetch and save the cookies
-    
+    file_path = save_cookies()  # Fetch and save the cookies
     if file_path:
         await message.reply_document(document=file_path)
     else:
