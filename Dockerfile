@@ -1,16 +1,13 @@
-FROM python:3.12-slim-bullseye
+FROM nikolaik/python-nodejs:python3.12-nodejs19
 
-WORKDIR /AlexaMusic
-RUN chmod 777 /AlexaMusic
+RUN apt-get -qq update && apt-get -qq -y upgrade \
+    && apt-get install -y --no-install-recommends ffmpeg \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get -qq update && apt-get -qq -y upgrade
-RUN apt-get install -y --no-install-recommends ffmpeg
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y git gcc build-essential
-
+COPY . /app/
+WORKDIR /app/
 RUN pip3 install -U pip
-COPY requirements.txt .
 RUN pip3 install --no-cache-dir -U -r requirements.txt
 
-COPY . .
-
-CMD ["bash", "start"]
+CMD bash start
