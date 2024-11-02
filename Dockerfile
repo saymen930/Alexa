@@ -16,5 +16,9 @@ RUN pip3 install -U -r requirements.txt
 RUN mkdir /AlexaMusic
 WORKDIR /AlexaMusic
 
+# Preparing for the Startup
+COPY start /start
+RUN chmod +x /start
+
 # Running Music Player Bot
-CMD ["bash", "start"]
+CMD ["bash", "/start"]
