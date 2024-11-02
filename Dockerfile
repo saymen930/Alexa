@@ -6,8 +6,9 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
-# Install necessary dependencies and clean up in a single step to reduce image size
-RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg \
+# Install necessary dependencies including Git and ffmpeg, then clean up
+RUN apt-get update -y && apt-get upgrade -y \
+    && apt-get install -y --no-install-recommends ffmpeg \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
