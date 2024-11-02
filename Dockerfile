@@ -21,4 +21,4 @@ COPY start /start
 RUN chmod +x /start
 
 # Running Music Player Bot
-CMD ["bash", "/start"]
+CMD ["bash", "start"]
