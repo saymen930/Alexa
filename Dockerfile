@@ -1,20 +1,22 @@
+# Use the official Python 3.9 slim image
 FROM python:3.9-slim-buster
 
-# Updating Packages
-RUN apt update && apt upgrade -y
-RUN apt install git curl python3-pip ffmpeg -y
+# Set environment variables to reduce interactive prompts and enable Python optimizations
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
 
-# Copying Requirements
-COPY requirements.txt /requirements.txt
+# Install necessary dependencies and clean up in a single step to reduce image size
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Installing Requirements
-RUN cd /
-RUN pip3 install --upgrade pip
-RUN pip3 install -U -r requirements.txt
+# Set the working directory and copy the application files
+WORKDIR /app
+COPY . /app
 
-# Setting up working directory
-RUN mkdir /AlexaMusic
-WORKDIR /AlexaMusic
+# Install Python dependencies
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
-# Running Music Player Bot
-CMD python3 -m AlexaMusic
+# Set the default command
+CMD ["bash", "start"]
