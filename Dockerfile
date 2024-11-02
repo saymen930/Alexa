@@ -12,7 +12,7 @@ WORKDIR /app
 COPY . /app
 
 # Install Python dependencies
-RUN pip install --no-cache-dir --upgrade -r requirements.txt
+RUN pip3 install --no-cache-dir -U -r requirements.txt
 
 # Set the default command
 CMD ["bash", "start"]
