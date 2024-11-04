@@ -12,7 +12,7 @@ as you want or you can collabe if you have new ideas.
 import logging
 import asyncio
 from pyrogram.enums import ChatType
-from pytgcalls.exceptions import NotInCallError, NoActiveGroupCall
+from pytgcalls.exceptions import NotInCallError, NoActiveGroupCall, GroupCallNotFound
 
 import config
 from AlexaMusic import app
@@ -64,25 +64,25 @@ async def auto_end():
             if not await is_autoend():
                 continue
             member = []
+            call = False
             for chat_id in autoend.items():
                 try:
                     ksk, me = await Alexa.vcmembers(chat_id)
-                    ksk = ksk>1
-                except NoActiveGroupCall:
-                    continue
-                except NotInCallError:
-                    continue
+                except GroupCallNotFound:
+                    ksk=1
+                    call=True
                 except:
-                    ksk = False
-
-                if not ksk and me:
+                    ksk=10
+                if ksk == 1:
+                    member.append(chat_id)
                     await set_loop(chat_id, 0)
                     await Alexa.stop_stream(chat_id)
                     try:
-                        await app.send_message(chat_id,"ʙᴏᴛ ᴀᴜᴛᴏᴍᴀᴛɪᴄᴀʟʟʏ ᴄʟᴇᴀʀᴇᴅ ᴛʜᴇ ǫᴜᴇᴜᴇ ᴀɴᴅ ʟᴇғᴛ ᴠɪᴅᴇᴏᴄʜᴀᴛ ʙᴇᴄᴀᴜsᴇ ɴᴏ ᴏɴᴇ ᴡᴀs ʟɪsᴛᴇɴɪɴɢ sᴏɴɢs ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.")
+                        if not call and me:
+                            await app.send_message(chat_id,"ʙᴏᴛ ᴀᴜᴛᴏᴍᴀᴛɪᴄᴀʟʟʏ ᴄʟᴇᴀʀᴇᴅ ᴛʜᴇ ǫᴜᴇᴜᴇ ᴀɴᴅ ʟᴇғᴛ ᴠɪᴅᴇᴏᴄʜᴀᴛ ʙᴇᴄᴀᴜsᴇ ɴᴏ ᴏɴᴇ ᴡᴀs ʟɪsᴛᴇɴɪɴɢ sᴏɴɢs ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.")
                     except Exception as e:
                         logging.info(f"Error: {e}")
-                    member.append(chat_id)
+                    
             autoend.pop(chat_id, None)
         except Exception as e:
             logging.info(f"Error: {e}")
