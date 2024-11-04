@@ -149,8 +149,8 @@ class Call(PyTgCalls):
 
     async def vcmembers(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
-        chat = await assistant.invoke(GetFullChannel(channel=(await assistant.resolve_peer(chat_id))))
-        participants = await assistant.invoke(
+        chat: base.messages.ChatFull = await assistant.invoke(GetFullChannel(channel=(await assistant.resolve_peer(chat_id))))
+        participant: base.phone.GroupParticipants = await assistant.invoke(
             GetGroupParticipants(
                 call=chat.chat.call,
                 ids=[],
@@ -159,8 +159,8 @@ class Call(PyTgCalls):
                 limit=1000
             )
         )
-        me = assistant.me.id in {k.peer.user_id for k in participants.participants}
-        return participants.count, me
+        me = assistant.me.id in {k.peer.user_id for k in participant.participants}
+        return participant.count, me
 
     async def force_stop_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
