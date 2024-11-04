@@ -149,8 +149,8 @@ class Call(PyTgCalls):
 
     async def vcmembers(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
-        chat = await assistant._mtproto.invoke(GetFullChannel(channel=(await assistant._mtproto.resolve_peer(chat_id))))
-        participant = await assistant._mtproto.invoke(
+        chat = await assistant.invoke(GetFullChannel(channel=(await assistant.resolve_peer(chat_id))))
+        participant = await assistant.invoke(
             GetGroupParticipants(
                 call=chat.raw.call,
                 ids=[],

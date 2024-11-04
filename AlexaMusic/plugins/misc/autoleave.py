@@ -82,7 +82,6 @@ async def auto_end():
                             await app.send_message(chat_id,"ʙᴏᴛ ᴀᴜᴛᴏᴍᴀᴛɪᴄᴀʟʟʏ ᴄʟᴇᴀʀᴇᴅ ᴛʜᴇ ǫᴜᴇᴜᴇ ᴀɴᴅ ʟᴇғᴛ ᴠɪᴅᴇᴏᴄʜᴀᴛ ʙᴇᴄᴀᴜsᴇ ɴᴏ ᴏɴᴇ ᴡᴀs ʟɪsᴛᴇɴɪɴɢ sᴏɴɢs ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.")
                     except Exception as e:
                         logging.info(f"Error: {e}")
-                    
             autoend.pop(chat_id, None)
         except Exception as e:
             logging.info(f"Error: {e}")
