@@ -316,6 +316,7 @@ class Call(PyTgCalls):
         if video:
             await add_active_video_chat(chat_id)
         if await is_autoend():
+            global counter, autoend
             counter[chat_id] = {}
             autoend[chat_id] = True
 
