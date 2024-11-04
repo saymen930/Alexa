@@ -16,7 +16,7 @@ from pytgcalls.exceptions import NotInCallError, NoActiveGroupCall
 
 import config
 from AlexaMusic import app
-from AlexaMusic.core.call import Alexa
+from AlexaMusic.core.call import Alexa, autoend
 from AlexaMusic.utils.database import (
     get_client,
     is_active_chat,
@@ -61,12 +61,12 @@ asyncio.create_task(auto_leave())
 
 async def auto_end():
     while True:
-        await asyncio.sleep(120)
+        await asyncio.sleep(30)
         try:
             if not await is_autoend():
                 continue
             member = []
-            for chat_id in autoend.items():
+            for chat_id in autoend.get(chat_id):
                 try:
                     ksk, me = await Alexa.vcmembers(chat_id)
                     ksk = ksk>1
