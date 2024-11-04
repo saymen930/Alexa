@@ -66,7 +66,7 @@ async def auto_end():
             if not await is_autoend():
                 continue
             member = []
-            for chat_id in autoend.get(chat_id):
+            for chat_id in autoend.items():
                 try:
                     ksk, me = await Alexa.vcmembers(chat_id)
                     ksk = ksk>1
