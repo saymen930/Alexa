@@ -31,6 +31,9 @@ dbb()
 # Heroku APP
 heroku()
 
+# Cookies
+save_cookies()
+
 # Bot Client
 app = AlexaBot()
 
