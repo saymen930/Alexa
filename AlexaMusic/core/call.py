@@ -639,31 +639,32 @@ class Call(PyTgCalls):
         @self.four.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT))
         @self.five.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT))
         async def participants_change_handler(client, update: Update):
-            chat_id = update.chat_id
-            participant = update.participant
-            # Initialize counter for the chat if not present
-            if chat_id not in counter:
-                counter[chat_id] = 0  # Start with zero participants
+            if not isinstance(update, GroupCallParticipant):
+                return
 
-            # Determine the action of the participant
-            if participant.action == GroupCallParticipant.Action.JOINED:
-                # Increment participant count
-                counter[chat_id] += 1
-                print(f"Participant joined in {chat_id}. Total participants: {counter[chat_id]}")
-                # Set auto end timer if only one participant is present
-                if counter[chat_id] == 1:
-                    autoend[chat_id] = datetime.now() + timedelta(minutes=1)
-                else:
-                    autoend[chat_id] = None  # Reset timer if more than one participant
-            elif participant.action == GroupCallParticipant.Action.LEFT:
-                # Decrement participant count
-                counter[chat_id] -= 1
-                print(f"Participant left in {chat_id}. Total participants: {counter[chat_id]}")
-                # Reset the auto end timer if no participants are left
-                if counter[chat_id] <= 0:
-                    counter[chat_id] = 0  # Ensure it doesn't go negative
-                    autoend[chat_id] = None  # Reset auto-end timer
-                elif counter[chat_id] == 1:
-                    autoend[chat_id] = datetime.now() + timedelta(minutes=1)
+            chat_id = update.chat_id
+            users = counter.get(chat_id)
+
+            if users is None:  # If there are no recorded users for the chat
+                try:
+                    got = len(await client.get_participants(chat_id))
+                except:
+                    return
+
+                counter[chat_id] = got
+                if got == 1:
+                    autoend[chat_id] = datetime.now() + timedelta(minutes=AUTO_END_TIME)
+                    return
+                autoend[chat_id] = {}
+            else:
+                final = (
+                    users + 1 if update.action == GroupCallParticipant.Action.JOINED
+                    else users - 1
+                )
+                counter[chat_id] = final
+                if final == 1:
+                    autoend[chat_id] = datetime.now() + timedelta(minutes=AUTO_END_TIME)
+                    return
+                autoend[chat_id] = {}
 
 Alexa = Call()
