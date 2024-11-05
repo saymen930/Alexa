@@ -639,12 +639,11 @@ class Call(PyTgCalls):
         @self.four.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT))
         @self.five.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT))
         async def participants_change_handler(client, update: Update):
-            LOGGER(__name__).error(update)
             chat_id = update.chat_id
             action = update.participant.action
             LOGGER(__name__).info(action)
             users = counter.get(chat_id)
-            if not users:
+            if users is None:
                 try:
                     got = len(await client.get_participants(chat_id))
                 except:
@@ -655,9 +654,9 @@ class Call(PyTgCalls):
                     return
                 autoend[chat_id] ={}
             else:
-                if action == "Action.JOINED":
+                if action == GroupCallParticipant.Action.JOINED:
                     final = users + 1
-                elif action == "Action.LEFT":
+                elif action == GroupCallParticipant.Action.LEFT:
                     final = users - 1
                 else:
                     LOGGER(__name__).info(f"Unrecognized action: {action}")
