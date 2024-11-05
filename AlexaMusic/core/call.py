@@ -640,19 +640,31 @@ class Call(PyTgCalls):
         @self.five.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT))
         async def participants_change_handler(client, update: Update):
             chat_id = update.chat_id
-            participant_action = update.participant.action
-            if participant_action == GroupCallParticipant.Action.JOINED:
-                current_count = counter.get(chat_id, 0) + 1
-            elif participant_action == GroupCallParticipant.Action.LEFT:
-                current_count = counter.get(chat_id, 1) - 1
+            users = counter.get(chat_id)
+            if not users:
+                try:
+                    got = len(await client.get_participants(chat_id))
+                except:
+                    return
+                counter[chat_id] = got
+                if got == 1:
+                    autoend[chat_id] = datetime.now() + timedelta(
+                        minutes=AUTO_END_TIME
+                    )
+                    return
+                autoend[chat_id] = {}
             else:
-                return
-            # Update the counter for the specific chat
-            counter[chat_id] = current_count
-            # Logic to set or clear autoend for the chat based on participant count
-            if current_count == 1:
-                autoend[chat_id] = datetime.now() + timedelta(minutes=AUTO_END_TIME)
-            else:
-                autoend[chat_id] = None
+                final = (
+                    users + 1
+                    if isinstance(update, JoinedGroupCallParticipant)
+                    else users - 1
+                )
+                counter[chat_id] = final
+                if final == 1:
+                    autoend[chat_id] = datetime.now() + timedelta(
+                        minutes=AUTO_END_TIME
+                    )
+                    return
+                autoend[chat_id] = {}
 
 Alexa = Call()
