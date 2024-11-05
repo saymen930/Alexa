@@ -635,20 +635,48 @@ class Call(PyTgCalls):
                 return
             await self.change_stream(client, update.chat_id)
 
-        @self.one.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED))
-        @self.two.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED))
-        @self.three.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED))
-        @self.four.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED))
-        @self.five.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED))
+        @self.one.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT))
+        @self.two.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT))
+        @self.three.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT))
+        @self.four.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT))
+        @self.five.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT))
         async def participants_change_handler(client, update: Update):
-            print(f'Participant joined in {update.chat_id}', update)
+            if not isinstance(update, UpdatedGroupCallParticipant):
+                return
+            chat_id = update.chat_id
+            users = counter.get(chat_id)
+            if not users:
+                try:
+                    got = len(await client.get_participants(chat_id))
+                except:
+                    return
+                counter[chat_id] = got
+                if got == 1:
+                    autoend[chat_id] = datetime.now() + timedelta(
+                        minutes=AUTO_END_TIME
+                    )
+                    return
+                autoend[chat_id] = {}
+            else:
+                final = (
+                    users + 1
+                    if isinstance(update, UpdatedGroupCallParticipant)
+                    else users - 1
+                )
+                counter[chat_id] = final
+                if final == 1:
+                    autoend[chat_id] = datetime.now() + timedelta(
+                        minutes=AUTO_END_TIME
+                    )
+                    return
+                autoend[chat_id] = {}
 
-        @self.one.on_update(fl.call_participant(GroupCallParticipant.Action.LEFT))
-        @self.two.on_update(fl.call_participant(GroupCallParticipant.Action.LEFT))
-        @self.three.on_update(fl.call_participant(GroupCallParticipant.Action.LEFT))
-        @self.four.on_update(fl.call_participant(GroupCallParticipant.Action.LEFT))
-        @self.five.on_update(fl.call_participant(GroupCallParticipant.Action.LEFT))
-        async def participants_change_handler(client, update: Update):
-            print(f'Participant Left in {update.chat_id}', update)
+        # @self.one.on_update(fl.call_participant(GroupCallParticipant.Action.LEFT))
+        # @self.two.on_update(fl.call_participant(GroupCallParticipant.Action.LEFT))
+        # @self.three.on_update(fl.call_participant(GroupCallParticipant.Action.LEFT))
+        # @self.four.on_update(fl.call_participant(GroupCallParticipant.Action.LEFT))
+        # @self.five.on_update(fl.call_participant(GroupCallParticipant.Action.LEFT))
+        # async def participants_change_handler(client, update: Update):
+        #     print(f'Participant Left in {update.chat_id}', update)
 
 Alexa = Call()
