@@ -635,25 +635,17 @@ class Call(PyTgCalls):
                 return
             await self.change_stream(client, update.chat_id)
 
-        @self.one.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED))
-        @self.two.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED))
-        @self.three.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED))
-        @self.four.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED))
-        @self.five.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED))
+        @self.one.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT | GroupCallParticipant.Action.UPDATED))
+        @self.two.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT | GroupCallParticipant.Action.UPDATED))
+        @self.three.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT | GroupCallParticipant.Action.UPDATED))
+        @self.four.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT | GroupCallParticipant.Action.UPDATED))
+        @self.five.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT | GroupCallParticipant.Action.UPDATED))
         async def participants_change_handler(client, update: Update):
+            print("hello")
             if isinstance(update, GroupCallParticipant):
                 return
+            print("u")
             chat_id = update.chat_id
             print(f"Participant joined in chat {chat_id}: {update}")
-
-
-
-        # @self.one.on_update(fl.call_participant(GroupCallParticipant.Action.LEFT))
-        # @self.two.on_update(fl.call_participant(GroupCallParticipant.Action.LEFT))
-        # @self.three.on_update(fl.call_participant(GroupCallParticipant.Action.LEFT))
-        # @self.four.on_update(fl.call_participant(GroupCallParticipant.Action.LEFT))
-        # @self.five.on_update(fl.call_participant(GroupCallParticipant.Action.LEFT))
-        # async def participants_change_handler(client, update: Update):
-        #     print(f'Participant Left in {update.chat_id}', update)
 
 Alexa = Call()
