@@ -641,7 +641,7 @@ class Call(PyTgCalls):
         async def participants_change_handler(client, update: Update):
             LOGGER(__name__).info(update)
             chat_id = update.chat_id
-            action = update['participant']['action']
+            action = update.participant.action
             LOGGER(__name__).info(action)
             users = counter.get(chat_id)
             if not users:
