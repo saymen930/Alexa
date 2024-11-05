@@ -639,9 +639,12 @@ class Call(PyTgCalls):
         @self.four.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT | GroupCallParticipant.Action.UPDATED))
         @self.five.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT | GroupCallParticipant.Action.UPDATED))
         async def participants_change_handler(client, update: Update):
+            if not isinstance(
+                update, GroupCallParticipant.Action.JOINED
+            ) and not isinstance(update, GroupCallParticipant.Action.LEFT):
+                return
             chat_id = update.chat_id
             users = counter.get(chat_id)
-            LOGGER(__name__).info(f"KSK")
             if not users:
                 try:
                     got = len(await client.get_participants(chat_id))
@@ -657,7 +660,7 @@ class Call(PyTgCalls):
             else:
                 final = (
                     users + 1
-                    if isinstance(update, UpdatedGroupCallParticipant)
+                    if isinstance(update, GroupCallParticipant.Action.JOINED)
                     else users - 1
                 )
                 counter[chat_id] = final
@@ -667,6 +670,5 @@ class Call(PyTgCalls):
                     )
                     return
                 autoend[chat_id] = {}
-            LOGGER(__name__).info(f"KSK3")
 
 Alexa = Call()

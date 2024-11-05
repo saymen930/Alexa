@@ -12,18 +12,11 @@ as you want or you can collabe if you have new ideas.
 import asyncio
 from datetime import datetime
 
-from pyrogram.enums import ChatType
-
 import config
 from AlexaMusic import app
 from AlexaMusic.core.call import Alexa, autoend
-from AlexaMusic.utils.database import (
-    get_client,
-    is_active_chat,
-    is_autoend,
-    set_loop
-)
-
+from AlexaMusic.utils.database import (get_client, is_active_chat,
+                                       is_autoend)
 async def auto_leave():
     if config.AUTO_LEAVING_ASSISTANT == str(True):
         while not await asyncio.sleep(config.AUTO_LEAVE_ASSISTANT_TIME):
