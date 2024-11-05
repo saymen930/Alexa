@@ -635,42 +635,21 @@ class Call(PyTgCalls):
                 return
             await self.change_stream(client, update.chat_id)
 
-        @self.one.on_update(fl.call_participant(GroupCallParticipant.Action.UPDATED))
-        @self.two.on_update(fl.call_participant(GroupCallParticipant.Action.UPDATED))
-        @self.three.on_update(fl.call_participant(GroupCallParticipant.Action.UPDATED))
-        @self.four.on_update(fl.call_participant(GroupCallParticipant.Action.UPDATED))
-        @self.five.on_update(fl.call_participant(GroupCallParticipant.Action.UPDATED))
-        async def participants_change_handler(client, update: Update):
-            if not isinstance(update, UpdatedGroupCallParticipant):
-                return
-            chat_id = update.chat_id
-            users = counter.get(chat_id)
-            if not users:
-                try:
-                    got = len(await client.get_participants(chat_id))
-                except:
-                    return
-                counter[chat_id] = got
-                if got == 1:
-                    autoend[chat_id] = datetime.now() + timedelta(
-                        minutes=AUTO_END_TIME
-                    )
-                    return
-                autoend[chat_id] = {}
-            else:
-                final = (
-                    users + 1
-                    if isinstance(update, UpdatedGroupCallParticipant)
-                    else users - 1
-                )
-                counter[chat_id] = final
-                if final == 1:
-                    autoend[chat_id] = datetime.now() + timedelta(
-                        minutes=AUTO_END_TIME
-                    )
-                    return
-                autoend[chat_id] = {}
+        @self.one.on_update()
+        @self.two.on_update()
+        @self.three.on_update()
+        @self.four.on_update()
+        @self.five.on_update()
+        async def participant_handler(client, update: Update):
+            # Ensure the update is a GroupCallParticipant event
+            if isinstance(update, GroupCallParticipant):
+                chat_id = update.chat_id
+                action = update.action  # Check the action type here
 
+                if action == GroupCallParticipant.Action.JOINED:
+                    print(f"Participant joined in chat {chat_id}: {update}")
+                elif action == GroupCallParticipant.Action.LEFT:
+                    print(f"Participant left chat {chat_id}: {update}")
         # @self.one.on_update(fl.call_participant(GroupCallParticipant.Action.LEFT))
         # @self.two.on_update(fl.call_participant(GroupCallParticipant.Action.LEFT))
         # @self.three.on_update(fl.call_participant(GroupCallParticipant.Action.LEFT))
