@@ -23,4 +23,3 @@ PyTgCrypto
 unidecode
 yt-dlp
 youtube-search-python
-git+https://github.com/Vivekkumar-IN/yt-dlp-youtube-oauth2
