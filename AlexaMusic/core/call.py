@@ -639,6 +639,6 @@ class Call(PyTgCalls):
         @self.four.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT))
         @self.five.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT))
         async def participants_change_handler(client, update: Update):
-            print(update)           
+            LOGGER(__name__).info(update)       
 
 Alexa = Call()
