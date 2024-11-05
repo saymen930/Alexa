@@ -635,20 +635,13 @@ class Call(PyTgCalls):
                 return
             await self.change_stream(client, update.chat_id)
 
-        @self.one.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED))
-        @self.two.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED))
-        @self.three.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED))
-        @self.four.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED))
-        @self.five.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED))
+        @self.one.on_update(fl.call_participant(GroupCallParticipant.Action.UpdatedGroupCallParticipant))
+        @self.two.on_update(fl.call_participant(GroupCallParticipant.Action.UpdatedGroupCallParticipant))
+        @self.three.on_update(fl.call_participant(GroupCallParticipant.Action.UpdatedGroupCallParticipant))
+        @self.four.on_update(fl.call_participant(GroupCallParticipant.Action.UpdatedGroupCallParticipant))
+        @self.five.on_update(fl.call_participant(GroupCallParticipant.Action.UpdatedGroupCallParticipant))
         async def participants_change_handler(client, update: Update):
-            print(f'Participant joined in {update.chat_id}', update)
+            return await app.send_message(update.chat_id, "Updated")
 
-        @self.one.on_update(fl.call_participant(GroupCallParticipant.Action.LEFT))
-        @self.two.on_update(fl.call_participant(GroupCallParticipant.Action.LEFT))
-        @self.three.on_update(fl.call_participant(GroupCallParticipant.Action.LEFT))
-        @self.four.on_update(fl.call_participant(GroupCallParticipant.Action.LEFT))
-        @self.five.on_update(fl.call_participant(GroupCallParticipant.Action.LEFT))
-        async def participants_change_handler(client, update: Update):
-            print(f'Participant Left in {update.chat_id}', update)
 
 Alexa = Call()
