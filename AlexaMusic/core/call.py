@@ -640,31 +640,32 @@ class Call(PyTgCalls):
         @self.five.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT))
         async def participants_change_handler(client, update: Update):
             chat_id = update.chat_id
-            users = counter.get(chat_id)
-            if not users:
+            participant_action = update.participant.action
+            # Initialize counters if chat_id is not yet in the dictionary
+            if chat_id not in counter:
                 try:
-                    got = len(await client.get_participants(chat_id))
+                    # Fetch initial participant count for the chat
+                    initial_count = len(await client.get_participants(chat_id))
                 except:
                     return
-                counter[chat_id] = got
-                if got == 1:
-                    autoend[chat_id] = datetime.now() + timedelta(
-                        minutes=AUTO_END_TIME
-                    )
+                counter[chat_id] = initial_count
+                # Set the auto-end time if only one participant is present
+                if initial_count == 1:
+                    autoend[chat_id] = datetime.now() + timedelta(minutes=1)
                     return
                 autoend[chat_id] = {}
+            # Adjust participant count based on JOINED or LEFT action
+            if participant_action == GroupCallParticipant.Action.JOINED:
+                current_count = counter[chat_id] + 1
+            elif participant_action == GroupCallParticipant.Action.LEFT:
+                current_count = counter[chat_id] - 1
             else:
-                final = (
-                    users + 1
-                    if isinstance(update, JoinedGroupCallParticipant)
-                    else users - 1
-                )
-                counter[chat_id] = final
-                if final == 1:
-                    autoend[chat_id] = datetime.now() + timedelta(
-                        minutes=AUTO_END_TIME
-                    )
-                    return
+                return  # If action is not JOINED or LEFT, do nothing
+            counter[chat_id] = current_count
+            # Update autoend timing based on the new participant count
+            if current_count == 1:
+                autoend[chat_id] = datetime.now() + timedelta(minutes=1)
+            else:
                 autoend[chat_id] = {}
 
 Alexa = Call()
