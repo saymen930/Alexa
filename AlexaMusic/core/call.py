@@ -319,7 +319,7 @@ class Call(PyTgCalls):
             await add_active_video_chat(chat_id)
         if await is_autoend():
             counter[chat_id] = {}
-            users = len(await assistant.get_participants(chat_id))
+            users = len(await assistant.get_call_members(chat_id))
             if users == 1:
                 autoend[chat_id] = datetime.now() + timedelta(seconds=10)
 
@@ -645,7 +645,7 @@ class Call(PyTgCalls):
             users = counter.get(chat_id)
             if users is None:
                 try:
-                    got = len(await client.get_participants(chat_id))
+                    got = len(await client.get_call_members(chat_id))
                 except:
                     return
                 counter[chat_id] = got
