@@ -9,14 +9,14 @@ This program is free software: you can redistribute it and can modify
 as you want or you can collabe if you have new ideas.
 """
 
-import logging
 import asyncio
+from datetime import datetime
+
 from pyrogram.enums import ChatType
-from pytgcalls.exceptions import NotInCallError, NoActiveGroupCall, GroupCallNotFound
 
 import config
 from AlexaMusic import app
-from AlexaMusic.core.call import Alexa, autoend, counter
+from AlexaMusic.core.call import Alexa, autoend
 from AlexaMusic.utils.database import (
     get_client,
     is_active_chat,
@@ -57,34 +57,29 @@ asyncio.create_task(auto_leave())
 
 
 async def auto_end():
-    global autoend, counter
-    while True:
-        await asyncio.sleep(30)
-        try:
-            if not await is_autoend():
+    while not await asyncio.sleep(5):
+        if not await is_autoend():
+            continue
+        for chat_id in autoend:
+            timer = autoend.get(chat_id)
+            if not timer:
                 continue
-            member = []
-            call = False
-            for chat_id in autoend.items():
+            if datetime.now() > timer:
+                if not await is_active_chat(chat_id):
+                    autoend[chat_id] = {}
+                    continue
+                autoend[chat_id] = {}
                 try:
-                    ksk, me = await Alexa.vcmembers(chat_id)
-                except GroupCallNotFound:
-                    ksk=1
-                    call=True
-                except:
-                    ksk=10
-                if ksk == 1:
-                    member.append(chat_id)
-                    await set_loop(chat_id, 0)
                     await Alexa.stop_stream(chat_id)
-                    try:
-                        if not call and me:
-                            await app.send_message(chat_id,"ʙᴏᴛ ᴀᴜᴛᴏᴍᴀᴛɪᴄᴀʟʟʏ ᴄʟᴇᴀʀᴇᴅ ᴛʜᴇ ǫᴜᴇᴜᴇ ᴀɴᴅ ʟᴇғᴛ ᴠɪᴅᴇᴏᴄʜᴀᴛ ʙᴇᴄᴀᴜsᴇ ɴᴏ ᴏɴᴇ ᴡᴀs ʟɪsᴛᴇɴɪɴɢ sᴏɴɢs ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.")
-                    except Exception as e:
-                        logging.info(f"Error: {e}")
-            autoend.pop(chat_id, None)
-        except Exception as e:
-            logging.info(f"Error: {e}")
+                except:
+                    continue
+                try:
+                    await app.send_message(
+                        chat_id,
+                        "Bot has left voice chat due to inactivity to avoid overload on servers. No-one was listening to the bot on voice chat.",
+                    )
+                except:
+                    continue
 
 
 asyncio.create_task(auto_end())
