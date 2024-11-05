@@ -52,7 +52,7 @@ asyncio.create_task(auto_leave())
 async def auto_end():
     while True:
         await asyncio.sleep(5)
-        if not await list(autoend.keys()):
+        if not await autoend.keys():
             continue
         for chat_id in autoend:
             timer = autoend.get(chat_id)
