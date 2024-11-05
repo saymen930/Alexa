@@ -321,7 +321,7 @@ class Call(PyTgCalls):
             counter[chat_id] = {}
             users = len(await assistant.get_participants(chat_id))
             if users == 1:
-                autoend[chat_id] = datetime.now() + timedelta(minutes=0.5)
+                autoend[chat_id] = datetime.now() + timedelta(seconds=10)
 
     async def change_stream(self, client, chat_id):
         check = db.get(chat_id)
@@ -639,6 +639,7 @@ class Call(PyTgCalls):
         @self.four.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT))
         @self.five.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT))
         async def participants_change_handler(client, update: Update):
+            print(f"OK")
             if not isinstance(update, UpdatedGroupCallParticipant):
                 return
             chat_id = update.chat_id
@@ -652,7 +653,7 @@ class Call(PyTgCalls):
                 counter[chat_id] = max(users, 0)  # Ensure count doesn't go negative
             # Handle auto-end logic
             if counter[chat_id] == 1:  # Only one user left
-                autoend[chat_id] = datetime.now() + timedelta(minutes=0.5)
+                autoend[chat_id] = datetime.now() + timedelta(seconds=10)
             elif counter[chat_id] == 0:  # No users left
                 autoend[chat_id] = {}  # Clear autoend timing
 
