@@ -11,6 +11,7 @@ as you want or you can collabe if you have new ideas.
 
 
 import asyncio
+from datetime import datetime, timedelta
 from typing import Union
 
 from pyrogram import Client
@@ -32,7 +33,7 @@ from pytgcalls.exceptions import (
     AlreadyJoinedError,
     NoActiveGroupCall,
 )
-from pytgcalls.types import ChatUpdate, MediaStream, Update
+from pytgcalls.types import ChatUpdate, MediaStream, Update, GroupCallParticipant, UpdatedGroupCallParticipant
 from pytgcalls.types import StreamAudioEnded
 
 import config
@@ -61,6 +62,7 @@ from strings import get_string
 
 autoend = {}
 counter = {}
+AUTO_END_TIME = 1
 
 
 async def _clear_(chat_id):
@@ -147,20 +149,20 @@ class Call(PyTgCalls):
         except:
             pass
 
-    async def vcmembers(self, chat_id: int):
-        assistant = await group_assistant(self, chat_id)
-        chat = await assistant.invoke(GetFullChannel(channel=(await assistant.resolve_peer(chat_id))))
-        participant = await assistant.invoke(
-            GetGroupParticipants(
-                call=chat.raw.call,
-                ids=[],
-                sources=[],
-                offset="",
-                limit=1000
-            )
-        )
-        me = assistant.me.id in {k.peer.user_id for k in participant.participants}
-        return participant.count, me
+    # async def vcmembers(self, chat_id: int):
+    #     assistant = await group_assistant(self, chat_id)
+    #     chat = await assistant.invoke(GetFullChannel(channel=(await assistant.resolve_peer(chat_id))))
+    #     participant = await assistant.invoke(
+    #         GetGroupParticipants(
+    #             call=chat.raw.call,
+    #             ids=[],
+    #             sources=[],
+    #             offset="",
+    #             limit=1000
+    #         )
+    #     )
+    #     me = assistant.me.id in {k.peer.user_id for k in participant.participants}
+    #     return participant.count, me
 
     async def force_stop_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
@@ -316,9 +318,12 @@ class Call(PyTgCalls):
         if video:
             await add_active_video_chat(chat_id)
         if await is_autoend():
-            global counter, autoend
             counter[chat_id] = {}
-            autoend[chat_id] = True
+            users = len(await assistant.get_participants(chat_id))
+            if users == 1:
+                autoend[chat_id] = datetime.now() + timedelta(
+                    minutes=AUTO_END_TIME
+                )
 
     async def change_stream(self, client, chat_id):
         check = db.get(chat_id)
@@ -630,5 +635,20 @@ class Call(PyTgCalls):
                 return
             await self.change_stream(client, update.chat_id)
 
+        @self.one.fl.call_participant(GroupCallParticipant.Action.JOINED)
+        @self.two.fl.call_participant(GroupCallParticipant.Action.JOINED)
+        @self.three.fl.call_participant(GroupCallParticipant.Action.JOINED)
+        @self.four.fl.call_participant(GroupCallParticipant.Action.JOINED)
+        @self.five.fl.call_participant(GroupCallParticipant.Action.JOINED)
+        async def participants_change_handler(client, update: Update):
+            print(f'Participant joined in {update.chat_id}', update)
+
+        @self.one.fl.call_participant(GroupCallParticipant.Action.LEFT)
+        @self.two.fl.call_participant(GroupCallParticipant.Action.LEFT)
+        @self.three.fl.call_participant(GroupCallParticipant.Action.LEFT)
+        @self.four.fl.call_participant(GroupCallParticipant.Action.LEFT)
+        @self.five.fl.call_participant(GroupCallParticipant.Action.LEFT)
+        async def participants_change_handler(client, update: Update):
+            print(f'Participant Left in {update.chat_id}', update)
 
 Alexa = Call()
