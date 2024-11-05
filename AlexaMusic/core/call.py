@@ -317,13 +317,11 @@ class Call(PyTgCalls):
         await music_on(chat_id)
         if video:
             await add_active_video_chat(chat_id)
-        # if await is_autoend():
-        #     counter[chat_id] = {}
-        #     users = len(await assistant.get_participants(chat_id))
-        #     if users == 1:
-        #         autoend[chat_id] = datetime.now() + timedelta(
-        #             minutes=AUTO_END_TIME
-        #         )
+        if await is_autoend():
+            counter[chat_id] = {}
+            users = len(await assistant.get_participants(chat_id))
+            if users == 1:
+                autoend[chat_id] = datetime.now() + timedelta(minutes=1)
 
     async def change_stream(self, client, chat_id):
         check = db.get(chat_id)
