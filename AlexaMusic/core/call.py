@@ -317,13 +317,13 @@ class Call(PyTgCalls):
         await music_on(chat_id)
         if video:
             await add_active_video_chat(chat_id)
-        if await is_autoend():
-            counter[chat_id] = {}
-            users = len(await assistant.get_participants(chat_id))
-            if users == 1:
-                autoend[chat_id] = datetime.now() + timedelta(
-                    minutes=AUTO_END_TIME
-                )
+        # if await is_autoend():
+        #     counter[chat_id] = {}
+        #     users = len(await assistant.get_participants(chat_id))
+        #     if users == 1:
+        #         autoend[chat_id] = datetime.now() + timedelta(
+        #             minutes=AUTO_END_TIME
+        #         )
 
     async def change_stream(self, client, chat_id):
         check = db.get(chat_id)
@@ -641,11 +641,34 @@ class Call(PyTgCalls):
         @self.four.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT | GroupCallParticipant.Action.UPDATED))
         @self.five.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT | GroupCallParticipant.Action.UPDATED))
         async def participants_change_handler(client, update: Update):
-            print("hello")
-            if isinstance(update, GroupCallParticipant):
-                return
-            print("u")
             chat_id = update.chat_id
-            print(f"Participant joined in chat {chat_id}: {update}")
+            users = counter.get(chat_id)
+            LOGGER(__name__).info(f"KSK")
+            if not users:
+                try:
+                    got = len(await client.get_participants(chat_id))
+                except:
+                    return
+                counter[chat_id] = got
+                if got == 1:
+                    autoend[chat_id] = datetime.now() + timedelta(
+                        minutes=AUTO_END_TIME
+                    )
+                    return
+                autoend[chat_id] = {}
+            else:
+                final = (
+                    users + 1
+                    if isinstance(update, UpdatedGroupCallParticipant)
+                    else users - 1
+                )
+                counter[chat_id] = final
+                if final == 1:
+                    autoend[chat_id] = datetime.now() + timedelta(
+                        minutes=AUTO_END_TIME
+                    )
+                    return
+                autoend[chat_id] = {}
+            LOGGER(__name__).info(f"KSK3")
 
 Alexa = Call()
