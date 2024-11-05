@@ -50,29 +50,34 @@ asyncio.create_task(auto_leave())
 
 
 async def auto_end():
-    while not await asyncio.sleep(5):
-        if not await is_autoend():
-            continue
-        for chat_id in autoend:
-            timer = autoend.get(chat_id)
-            if not timer:
+    while True:
+        await asyncio.sleep(10)
+        try:
+            ender = await is_autoend()
+            if not ender:
                 continue
-            if datetime.now() > timer:
-                if not await is_active_chat(chat_id):
+            for chat_id in autoend:
+                timer = autoend.get(chat_id)
+                if not timer:
+                    continue
+                if datetime.now() > timer:
+                    if not await is_active_chat(chat_id):
+                        autoend[chat_id] = {}
+                        continue
                     autoend[chat_id] = {}
-                    continue
-                autoend[chat_id] = {}
-                try:
-                    await Alexa.stop_stream(chat_id)
-                except:
-                    continue
-                try:
-                    await app.send_message(
-                        chat_id,
-                        "Bot has left voice chat due to inactivity to avoid overload on servers. No-one was listening to the bot on voice chat.",
-                    )
-                except:
-                    continue
+                    try:
+                        await Alexa.stop_stream(chat_id)
+                    except:
+                        continue
+                    try:
+                        await app.send_message(
+                            chat_id,
+                            "Bot has left voice chat due to inactivity to avoid overload on servers. No-one was listening to the bot on voice chat.",
+                        )
+                    except:
+                        continue
+        except:
+            pass
 
 
 asyncio.create_task(auto_end())
