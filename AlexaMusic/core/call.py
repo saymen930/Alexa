@@ -639,6 +639,27 @@ class Call(PyTgCalls):
         @self.four.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT))
         @self.five.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT))
         async def participants_change_handler(client, update: Update):
-            LOGGER(__name__).info(update)       
+            LOGGER(__name__).info(update)
+            chat_id = update.chat_id
+            action = update['participant']['action']
+            LOGGER(__name__).info(action)
+            users = counter.get(chat_id)
+            if not users:
+                try:
+                    got = len(await client.get_participants(chat_id))
+                except:
+                    return
+                counter[chat_id] = got
+                if got == 1:
+                    autoend[chat_id] = datetime.now() + timedelta(seconds=10)
+                    return
+                autoend[chat_id] ={}
+            else:
+                final = ()
+                counter[chat_id] = final
+                if final == 1:
+                    autoend[chat_id] = datetime.now() + timedelta(seconds=10)
+                    return
+                autoend[chat_id] = {}
 
 Alexa = Call()
