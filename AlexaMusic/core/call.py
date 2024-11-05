@@ -639,32 +639,21 @@ class Call(PyTgCalls):
         @self.four.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT))
         @self.five.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED | GroupCallParticipant.Action.LEFT))
         async def participants_change_handler(client, update: Update):
-            if not isinstance(update, GroupCallParticipant):
+            if not isinstance(update, UpdatedGroupCallParticipant):
                 return
-
             chat_id = update.chat_id
-            users = counter.get(chat_id)
-
-            if users is None:  # If there are no recorded users for the chat
-                try:
-                    got = len(await client.get_participants(chat_id))
-                except:
-                    return
-
-                counter[chat_id] = got
-                if got == 1:
-                    autoend[chat_id] = datetime.now() + timedelta(minutes=AUTO_END_TIME)
-                    return
-                autoend[chat_id] = {}
-            else:
-                final = (
-                    users + 1 if update.action == GroupCallParticipant.Action.JOINED
-                    else users - 1
-                )
-                counter[chat_id] = final
-                if final == 1:
-                    autoend[chat_id] = datetime.now() + timedelta(minutes=AUTO_END_TIME)
-                    return
-                autoend[chat_id] = {}
+            participant = update.participant
+            # Check the participant's action
+            if participant.action == GroupCallParticipant.Action.JOINED:
+                users = counter.get(chat_id, 0) + 1  # Increment user count on join
+                counter[chat_id] = users
+            elif participant.action == GroupCallParticipant.Action.LEFT:
+                users = counter.get(chat_id, 0) - 1  # Decrement user count on leave
+                counter[chat_id] = max(users, 0)  # Ensure count doesn't go negative
+            # Handle auto-end logic
+            if counter[chat_id] == 1:  # Only one user left
+                autoend[chat_id] = datetime.now() + timedelta(minutes=0.5)
+            elif counter[chat_id] == 0:  # No users left
+                autoend[chat_id] = {}  # Clear autoend timing
 
 Alexa = Call()
