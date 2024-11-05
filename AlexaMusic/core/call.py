@@ -645,10 +645,10 @@ class Call(PyTgCalls):
             chat_id = update.chat_id
             participant = update.participant
             # Check the participant's action
-            if participant.action == GroupCallParticipant.Action.JOINED:
+            if participant.action == "Action.JOINED":
                 users = counter.get(chat_id, 0) + 1  # Increment user count on join
                 counter[chat_id] = users
-            elif participant.action == GroupCallParticipant.Action.LEFT:
+            elif participant.action == "Action.LEFT":
                 users = counter.get(chat_id, 0) - 1  # Decrement user count on leave
                 counter[chat_id] = max(users, 0)  # Ensure count doesn't go negative
             # Handle auto-end logic
